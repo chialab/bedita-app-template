@@ -7,8 +7,8 @@
   "scripts": {
     "dev": "rna serve",
     "build": "NODE_ENV='production' rna build",
-    "lint:css": "stylelint '**/resources/css/**/*.css'",
-    "lint:js": "eslint '**/resources/js/**/*.{ts,tsx}'"
+    "lint:script": "eslint '**/resources/**/*.{ts,tsx}'",
+    "lint:style": "stylelint '**/resources/**/*.css'"
   },
   "keywords": [],
   "author": "",

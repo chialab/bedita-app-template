@@ -5,7 +5,7 @@ on:
   push: {}
 
 jobs:
-  js:
+  eslint:
     name: 'Run eslint'
     runs-on: 'ubuntu-latest'
 
@@ -22,7 +22,7 @@ jobs:
       - name: Lint
         run: yarn lint:js
 
-  css:
+  stylelint:
     name: 'Run stylelint'
     runs-on: 'ubuntu-latest'
 
@@ -37,4 +37,4 @@ jobs:
       - name: 'Install NPM dependencies'
         run: yarn install
       - name: Lint
-        run: yarn lint:css
+        run: yarn lint:style
