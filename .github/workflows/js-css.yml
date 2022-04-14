@@ -20,7 +20,7 @@ jobs:
       - name: 'Install NPM dependencies'
         run: yarn install
       - name: Lint
-        run: yarn lint:js
+        run: yarn lint:script
 
   stylelint:
     name: 'Run stylelint'
