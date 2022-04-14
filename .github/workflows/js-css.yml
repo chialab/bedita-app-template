@@ -1,0 +1,40 @@
+name: Linting
+
+on:
+  pull_request: {}
+  push: {}
+
+jobs:
+  js:
+    name: 'Run eslint'
+    runs-on: 'ubuntu-latest'
+
+    steps:
+      - name: 'Checkout current revision'
+        uses: 'actions/checkout@v2'
+      - name: 'Setup Node'
+        uses: 'actions/setup-node@v2'
+        with:
+          node-version: lts
+          cache: yarn
+      - name: 'Install NPM dependencies'
+        run: yarn install
+      - name: Lint
+        run: yarn lint:js
+
+  css:
+    name: 'Run stylelint'
+    runs-on: 'ubuntu-latest'
+
+    steps:
+      - name: 'Checkout current revision'
+        uses: 'actions/checkout@v2'
+      - name: 'Setup Node'
+        uses: 'actions/setup-node@v2'
+        with:
+          node-version: lts
+          cache: yarn
+      - name: 'Install NPM dependencies'
+        run: yarn install
+      - name: Lint
+        run: yarn lint:css
