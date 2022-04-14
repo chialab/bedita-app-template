@@ -15,72 +15,126 @@
 namespace App\Test\TestCase;
 
 use App\Application;
+use Cake\Core\Configure;
+use Cake\Core\Plugin;
+use Cake\Core\PluginInterface;
 use Cake\Error\Middleware\ErrorHandlerMiddleware;
 use Cake\Http\MiddlewareQueue;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
+use Chialab\FrontendKit\Middleware\StatusMiddleware;
 use InvalidArgumentException;
 
 /**
- * ApplicationTest class
+ * Test {@see \App\Application} class.
+ *
+ * @coversDefaultClass \App\Application
  */
 class ApplicationTest extends TestCase
 {
     use IntegrationTestTrait;
 
     /**
-     * testBootstrap
+     * @inheritDoc
+     */
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        Plugin::getCollection()->clear();
+    }
+
+    /**
+     * Test {@see Application::bootstrap()} method with debug enabled and no frontend plugin enabled.
      *
      * @return void
+     * @covers ::bootstrap()
      */
-    public function testBootstrap()
+    public function testBootstrapDebug(): void
     {
-        $app = new Application(dirname(dirname(__DIR__)) . '/config');
+        Configure::write('debug', true);
+        Configure::write('FrontendPlugin', null);
+
+        $expectedPlugins = [
+            'Bake',
+            'BEdita/AWS',
+            'BEdita/Core',
+            'BEdita/DevTools',
+            'BEdita/I18n',
+            'Chialab/FrontendKit',
+            'DebugKit',
+            'Migrations',
+        ];
+
+        $app = new Application(CONFIG);
+        static::assertCount(0, $app->getPlugins());
         $app->bootstrap();
         $plugins = $app->getPlugins();
 
-        $this->assertCount(3, $plugins);
-        $this->assertSame('Bake', $plugins->get('Bake')->getName());
-        $this->assertSame('Migrations', $plugins->get('Migrations')->getName());
-        $this->assertSame('DebugKit', $plugins->get('DebugKit')->getName());
+        static::assertSameSize($expectedPlugins, $plugins);
+        foreach ($expectedPlugins as $plugin) {
+            static::assertInstanceOf(PluginInterface::class, $plugins->get($plugin));
+            static::assertSame($plugin, $plugins->get($plugin)->getName());
+        }
     }
 
     /**
-     * testBootstrapPluginWitoutHalt
+     * Test {@see Application::bootstrap()} method with debug disabled and `BEdita/API` as frontend plugin.
      *
      * @return void
+     * @covers ::bootstrap()
      */
-    public function testBootstrapPluginWithoutHalt()
+    public function testBootstrap(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        Configure::write('debug', false);
+        Configure::write('FrontendPlugin', 'BEdita/API');
 
-        $app = $this->getMockBuilder(Application::class)
-            ->setConstructorArgs([dirname(dirname(__DIR__)) . '/config'])
-            ->setMethods(['addPlugin'])
-            ->getMock();
+        $expectedPlugins = [
+            'Bake',
+            'BEdita/API',
+            'BEdita/AWS',
+            'BEdita/Core',
+            'BEdita/I18n',
+            'Chialab/FrontendKit',
+            'Migrations',
+        ];
 
-        $app->method('addPlugin')
-            ->will($this->throwException(new InvalidArgumentException('test exception.')));
-
+        $app = new Application(CONFIG);
+        static::assertCount(0, $app->getPlugins());
         $app->bootstrap();
+        $plugins = $app->getPlugins();
+
+        static::assertSameSize($expectedPlugins, $plugins);
+        foreach ($expectedPlugins as $plugin) {
+            static::assertInstanceOf(PluginInterface::class, $plugins->get($plugin));
+            static::assertSame($plugin, $plugins->get($plugin)->getName());
+        }
     }
 
     /**
-     * testMiddleware
+     * Test {@see Application::middleware()} method.
      *
      * @return void
+     * @covers ::middleware()
      */
-    public function testMiddleware()
+    public function testMiddleware(): void
     {
-        $app = new Application(dirname(dirname(__DIR__)) . '/config');
-        $middleware = new MiddlewareQueue();
+        $expectedMiddlewares = [
+            ErrorHandlerMiddleware::class,
+            AssetMiddleware::class,
+            StatusMiddleware::class,
+            RoutingMiddleware::class,
+        ];
 
-        $middleware = $app->middleware($middleware);
+        $app = new Application(CONFIG);
 
-        $this->assertInstanceOf(ErrorHandlerMiddleware::class, $middleware->get(0));
-        $this->assertInstanceOf(AssetMiddleware::class, $middleware->get(1));
-        $this->assertInstanceOf(RoutingMiddleware::class, $middleware->get(2));
+        $middlewareQueue = $app->middleware(new MiddlewareQueue());
+
+        static::assertSameSize($expectedMiddlewares, $middlewareQueue);
+        foreach ($expectedMiddlewares as $i => $middleware) {
+            static::assertInstanceOf($middleware, $middlewareQueue->get($i));
+        }
     }
 }
