@@ -9,7 +9,6 @@
 # BEdita specific files #
 #########################
 /webroot/_files/*
-!/webroot/_files/.gitkeep
 
 # RNA specific files #
 ######################
