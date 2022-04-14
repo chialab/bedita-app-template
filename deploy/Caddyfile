@@ -1,0 +1,58 @@
+{
+	admin off
+	local_certs
+	skip_install_trust
+	default_sni bedita
+}
+
+(common) {
+    root * /app/webroot
+
+    encode gzip
+    push
+
+    header /build/* ?Cache-Control "public, max-age=604800, immutable"
+    header -Server
+
+    file_server {
+        hide .*
+    }
+
+    log {
+        output stderr
+        format json
+        level DEBUG
+        format filter {
+            wrap json
+            fields {
+                request>headers>Authorization delete
+                request>headers>Cookie delete
+                resp_headers>Set-Cookie delete
+            }
+        }
+    }
+}
+
+(site) {
+    php_fastcgi {$PHPFPM_HOST} {
+        env FRONTEND_PLUGIN "{args.0}"
+        env STATUS_LEVEL "{args.1}"
+        env STAGING "{args.2}"
+        env MANAGER_URL "{args.3}"
+    }
+}
+
+# API
+https://bedita, https://localhost, https://api.test.bedita.local, https://api.bedita.local, https:// {
+    import common
+
+    # ELB health check
+    respond /status 204
+
+    import site "BEdita/API" "off" "0"
+}
+
+# Task health check
+http://localhost {
+    respond /status 204
+}

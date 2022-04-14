@@ -1,0 +1,50 @@
+# CakePHP specific files #
+##########################
+/config/app_local.php
+/config/.env
+/logs/*
+/tmp/*
+/vendor/*
+
+# BEdita specific files #
+#########################
+/webroot/_files/*
+!/webroot/_files/.gitkeep
+
+# RNA specific files #
+######################
+/node_modules
+/webroot/build
+/plugins/*/webroot/build
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+.directory
+
+# Tool specific files #
+#######################
+# vim
+*~
+*.swp
+*.swo
+# sublime text & textmate
+*.sublime-*
+*.stTheme.cache
+*.tmlanguage.cache
+*.tmPreferences.cache
+# Eclipse
+.settings/*
+# JetBrains, aka PHPStorm, IntelliJ IDEA
+.idea/*
+# NetBeans
+nbproject/*
+# Visual Studio Code
+.vscode

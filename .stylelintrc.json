@@ -1,0 +1,4 @@
+{
+    "extends": "@chialab/stylelint-config",
+    "ignoreFiles": ["**/*.twig"]
+}

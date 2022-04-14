@@ -1,0 +1,69 @@
+{
+    "name": "chialab/bedita-app-template",
+    "description": "A template for BEdita websites and apps.",
+    "homepage": "https://www.bedita.com/",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.4",
+        "ext-json": "*",
+        "bedita/api": "^4.7",
+        "bedita/aws": "^2.0",
+        "bedita/core": "^4.7",
+        "bedita/i18n": "^3.2",
+        "cakephp/cakephp": "^3.10",
+        "cakephp/migrations": "^2.0.0",
+        "cakephp/plugin-installer": "^1.3",
+        "chialab/frontend-kit": "^1.0.0",
+        "mobiledetect/mobiledetectlib": "2.*"
+    },
+    "require-dev": {
+        "bedita/dev-tools": "^1.4",
+        "cakephp/bake": "^1.9.0",
+        "cakephp/cakephp-codesniffer": "^3.0",
+        "cakephp/debug_kit": "^3.17.0",
+        "josegonzalez/dotenv": "3.*",
+        "phpstan/phpstan": "^1.5",
+        "phpunit/phpunit": "^6",
+        "psy/psysh": "@stable"
+    },
+    "suggest": {
+        "markstory/asset_compress": "An asset compression plugin which provides file concatenation and a flexible filter system for preprocessing and minification.",
+        "dereuromark/cakephp-ide-helper": "After baking your code, this keeps your annotations in sync with the code evolving from there on for maximum IDE and PHPStan/Psalm compatibility."
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Test\\": "tests/",
+            "Cake\\Test\\": "vendor/cakephp/cakephp/tests/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": "App\\Console\\Installer::postInstall",
+        "post-create-project-cmd": "App\\Console\\Installer::postInstall",
+        "migrate": [
+            "bin/cake migrations migrate -p BEdita/Core",
+            "bin/cake migrations migrate",
+            "bin/cake cache clear_all"
+        ],
+        "check": [
+            "@test",
+            "@cs-check"
+        ],
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "stan": "phpstan analyse",
+        "test": "phpunit --colors=always"
+    },
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "cakephp/plugin-installer": true
+        }
+    }
+}

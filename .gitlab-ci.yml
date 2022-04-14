@@ -1,0 +1,189 @@
+---
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  AWS_WEB_IDENTITY_TOKEN_FILE: '.aws/web-identity-credentials'
+  GITLAB_CI_OIDC_PROVIDER: 'https://gitlab-ci-oidc.chialab.io'
+  GITLAB_CI_OIDC_CLIENT_ID: 'sts.amazonaws.com'
+  # ECR_REGISTRY: '000000000000.dkr.ecr.eu-west-1.amazonaws.com'
+  # ECR_IMAGE: "${ECR_REGISTRY}/bedita-app"
+  IMAGE_TAG: "${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+
+###
+# Tests
+###
+.composer:
+  image: chialab/php:7.4
+  variables:
+    COMPOSER_CACHE_DIR: "${CI_PROJECT_DIR}/.cache/composer"
+  cache:
+    key: "composer-${CI_COMMIT_REF_SLUG}"
+    paths:
+      - .cache/composer
+test:php:cs:
+  needs: []
+  stage: test
+  extends: .composer
+  before_script:
+    - composer install --prefer-dist
+  script:
+    - composer run-script cs-check -- -n
+test:php:stan:
+  needs: []
+  stage: test
+  extends: .composer
+  before_script:
+    - composer install --prefer-dist
+  script:
+    - composer run-script stan
+
+.yarn:
+  image: node:lts
+  variables:
+    YARN_CACHE_DIR: "${CI_PROJECT_DIR}/.cache/yarn"
+  before_script:
+    - test ! -f "${NPMRC}" || cp "${NPMRC}" "${HOME}/.npmrc"
+    - yarn install --cache-dir $YARN_CACHE_DIR
+  cache:
+    key: "yarn-${CI_COMMIT_REF_SLUG}"
+    paths:
+      - .cache/yarn
+test:js:lint:
+  needs: []
+  stage: test
+  allow_failure: true
+  extends: .yarn
+  script:
+    -  yarn run lint:js
+test:css:lint:
+  needs: []
+  stage: test
+  allow_failure: true
+  extends: .yarn
+  script:
+    - yarn run lint:css
+
+###
+# Build Docker image
+###
+build:assets: # build JS and CSS assets
+  needs: []
+  stage: build
+  only:
+    - main
+    - tags
+  extends: .yarn
+  script:
+    - yarn build
+  artifacts:
+    paths:
+      - ./plugins/*/webroot/build
+      - ./webroot/build
+    expire_in: 1 day
+
+.docker:
+  needs: ['build:assets']
+  stage: build
+  image: ghcr.io/chialab/docker-buildx-ecr:1
+  variables:
+    DOCKER_HOST: 'tcp://docker:2376'
+    DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
+    DOCKER_TLS_CERTDIR: '/certs'
+    DOCKER_TLS_VERIFY: 1
+    PLATFORM: 'linux/amd64,linux/arm64'
+    BASE_IMAGE: 'chialab/php'
+  services:
+    - docker:dind
+  before_script:
+    - |
+      if [ -n "${ECR_REGISTRY}" ]; then
+        apk add --update --no-cache curl
+        mkdir -p "$(dirname "${AWS_WEB_IDENTITY_TOKEN_FILE}")"
+        curl -s -X POST "${GITLAB_CI_OIDC_PROVIDER}/token" -H "Authorization: Bearer ${CI_JOB_JWT}" -H "Content-Type: application/json" -d "{\"client_id\":\"${GITLAB_CI_OIDC_CLIENT_ID}\",\"grant_type\":\"client_credentials\"}" > "${AWS_WEB_IDENTITY_TOKEN_FILE}"
+        aws-ecr-get-login-password | docker login --username AWS --password-stdin "${ECR_REGISTRY}")
+      else
+        docker login -u "${CI_REGISTRY_USER}" --password-stdin "${CI_REGISTRY}" <<< "${CI_REGISTRY_PASSWORD}"
+      fi
+    - 'docker run --rm --privileged multiarch/qemu-user-static --reset -p yes'
+    - 'docker context create --docker "host=${DOCKER_HOST},ca=/certs/client/ca.pem,cert=/certs/client/cert.pem,key=/certs/client/key.pem" multi-arch'
+    - 'docker --context multi-arch buildx create --use'
+  script:
+    - 'docker --context multi-arch buildx build --platform "${PLATFORM}" --build-arg BASE_IMAGE -t "${ECR_IMAGE:-$CI_REGISTRY_IMAGE}${IMAGE_SUFFIX}:${IMAGE_TAG}" --file "${DOCKERFILE}" --push .'
+build:docker:app:
+  extends: .docker
+  variables:
+    IMAGE_SUFFIX: "/app"
+    DOCKERFILE: Dockerfile.app
+  only:
+    - main
+    - tags
+build:docker:web:
+  extends: .docker
+  variables:
+    IMAGE_SUFFIX: "/web"
+    DOCKERFILE: Dockerfile.web
+  only:
+    - main
+    - tags
+
+###
+# Deploy
+###
+.deploy:
+  needs: ['build:docker']
+  stage: deploy
+  image:
+    name: amazon/aws-cli
+    entrypoint:
+      - /usr/bin/env
+  variables:
+    LOG_GROUP: "/ecs/${ECS_CLUSTER}"
+    LOG_STREAM_PREFIX: "${ENV_NAME}"
+  before_script:
+    - 'yum install -y gettext'
+    - 'mkdir -p "$(dirname "${AWS_WEB_IDENTITY_TOKEN_FILE}")"'
+    - 'curl -s -X POST "${GITLAB_CI_OIDC_PROVIDER}/token" -H "Authorization: Bearer ${CI_JOB_JWT}" -H "Content-Type: application/json" -d "{\"client_id\":\"${GITLAB_CI_OIDC_CLIENT_ID}\",\"grant_type\":\"client_credentials\"}" > "${AWS_WEB_IDENTITY_TOKEN_FILE}"'
+  script:
+    - export TASK_DEFINITION_ARN="$(aws ecs register-task-definition --cli-input-json "$(envsubst < "deploy/${ENV_NAME}.json")" --output text --query "taskDefinition.taskDefinitionArn")"
+    - 'printf "New task definition: %s\n" "${TASK_DEFINITION_ARN}"'
+
+    - export MIGRATION_TASK_ARN="$(aws ecs run-task --cluster "${ECS_CLUSTER}" --task-definition "${TASK_DEFINITION_ARN}" --capacity-provider-strategy "$(aws ecs describe-services --cluster "${ECS_CLUSTER}" --services "${ECS_SERVICE}" --query 'services[0].capacityProviderStrategy')" --network-configuration "$(aws ecs describe-services --cluster "${ECS_CLUSTER}" --services "${ECS_SERVICE}" --query 'services[0].networkConfiguration')" --overrides '{"containerOverrides":[{"name":"app","command":["composer","run-script","migrate"]},{"name":"web","command":["tail","-f","/dev/null"]}]}' --query 'tasks[0].taskArn' --output text)"
+    - 'printf "Migration task: %s\n" "${MIGRATION_TASK_ARN}"'
+    - aws ecs wait tasks-stopped --cluster "${ECS_CLUSTER}" --task "${MIGRATION_TASK_ARN}"
+    - |
+      MIGRATION_EXIT_CODE="$(aws ecs describe-tasks --cluster "${ECS_CLUSTER}" --task "${MIGRATION_TASK_ARN}" --query 'tasks[0].containers[?name == `app`].exitCode' --output text)"
+      if [ "${MIGRATION_EXIT_CODE}" != 0 ]; then exit "${MIGRATION_EXIT_CODE}"; fi
+
+    - aws ecs update-service --cluster "${ECS_CLUSTER}" --service "${ECS_SERVICE}" --task-definition "${TASK_DEFINITION_ARN}" --force-new-deployment
+    - aws ecs wait services-stable --cluster "${ECS_CLUSTER}" --services "${ECS_SERVICE}"
+  environment:
+    name: "${ENV_NAME}"
+    url: "${ENV_URL}"
+
+# deploy:test:
+#   only:
+#     - main
+#   extends: .deploy
+#   variables:
+#     ECS_CLUSTER: 'test'
+#     ECS_SERVICE: 'test-bedita'
+#     TASK_DEFINITION_FAMILY: 'test-bedita'
+#     IAM_ROLE_ARN: 'arn:aws:iam::000000000000:role/test'
+#     ENV_NAME: 'test'
+#     ENV_URL: 'https://test.app.bedita.cloud'
+
+# deploy:production:
+#   only:
+#     - tags
+#   extends: .deploy
+#   when: manual
+#   variables:
+#     ECS_CLUSTER: 'production'
+#     ECS_SERVICE: 'prod-bedita'
+#     TASK_DEFINITION_FAMILY: 'prod-bedita'
+#     IAM_ROLE_ARN: 'arn:aws:iam::000000000000:role/prod'
+#     ENV_NAME: 'production'
+#     ENV_URL: 'https://app.bedita.cloud'

@@ -1,0 +1,60 @@
+{
+    "family": "${TASK_DEFINITION_FAMILY}",
+    "taskRoleArn": "${IAM_ROLE_ARN}",
+    "requiresCompatibilities": ["EC2"],
+    "networkMode": "awsvpc",
+    "containerDefinitions": [
+        {
+            "name": "app",
+            "image": "${ECR_IMAGE}:${IMAGE_TAG}",
+            "essential": true,
+            "memory": 768,
+            "environment": [],
+            "healthCheck": {
+                "retries": 3,
+                "command": ["CMD", "curl", "-k", "https://localhost/.well-known/status"],
+                "timeout": 5,
+                "interval": 5
+            },
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "${LOG_GROUP}",
+                    "awslogs-region": "${AWS_DEFAULT_REGION}",
+                    "awslogs-stream-prefix": "${LOG_STREAM_PREFIX}",
+                    "awslogs-multiline-pattern": "^(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3} - |\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} |\\[[\\d ]?\\d-\\w{3}-\\d{4} \\d{2}:\\d{2}:\\d{2}\\] )"
+                }
+            }
+        },
+        {
+            "name": "web",
+            "image": "caddy:2-alpine",
+            "essential": true,
+            "memory": 64,
+            "environment": [
+                {"name": "PHPFPM_HOST", "value": "localhost:9000"}
+            ],
+            "portMappings": [
+                {
+                    "containerPort": 443,
+                    "hostPort": 443,
+                    "protocol": "tcp"
+                }
+            ],
+            "healthCheck": {
+                "retries": 3,
+                "command": ["CMD", "wget", "-qO-", "http://localhost/status"],
+                "timeout": 5,
+                "interval": 5
+            },
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "${LOG_GROUP}",
+                    "awslogs-region": "${AWS_DEFAULT_REGION}",
+                    "awslogs-stream-prefix": "${LOG_STREAM_PREFIX}"
+                }
+            }
+        }
+    ]
+}

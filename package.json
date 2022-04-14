@@ -1,0 +1,30 @@
+{
+  "name": "bedita-app-template",
+  "description": "A template for BEdita websites and apps.",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "rna serve",
+    "build": "NODE_ENV='production' rna build",
+    "lint:css": "stylelint '**/resources/css/**/*.css'",
+    "lint:js": "eslint '**/resources/js/**/*.{ts,tsx}'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "workspaces": [
+    "plugins/*"
+  ],
+  "devDependencies": {
+    "@chialab/eslint-config": "^3.0.0",
+    "@chialab/rna": "^0.15.0",
+    "@chialab/rna-bundler": "^0.15.0",
+    "@chialab/rna-dev-server": "^0.15.0",
+    "@chialab/stylelint-config": "^2.0.0",
+    "eslint": "^8.0.0",
+    "eslint-plugin-jsdoc": "^38.1.3",
+    "stylelint": "^14.0.0",
+    "typescript": "^4.5.5"
+  }
+}

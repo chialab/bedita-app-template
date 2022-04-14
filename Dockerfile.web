@@ -1,0 +1,5 @@
+ARG BASE_IMAGE=caddy
+ARG VERSION=2-alpine
+FROM ${BASE_IMAGE}:${VERSION}
+
+COPY deploy/Caddyfile /etc/caddy/Caddyfile
