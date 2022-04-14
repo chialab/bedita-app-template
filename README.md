@@ -1,27 +1,26 @@
 # CakePHP Application Skeleton
 
-[![Build Status](https://img.shields.io/travis/cakephp/app/master.svg?style=flat-square)](https://travis-ci.org/cakephp/app)
-[![Total Downloads](https://img.shields.io/packagist/dt/cakephp/app.svg?style=flat-square)](https://packagist.org/packages/cakephp/app)
+[![Total Downloads](https://img.shields.io/packagist/dt/chialab/bedita-app-template.svg?style=flat-square)](https://packagist.org/packages/chialab/bedita-app-template)
 
-A skeleton for creating applications with [CakePHP](https://cakephp.org) 3.x.
+A skeleton for creating applications with [BEdita](https://www.bedita.com) 4.x.
 
-The framework source code can be found here: [cakephp/cakephp](https://github.com/cakephp/cakephp).
+The framework source code can be found here: [bedita/bedita](https://github.com/bedita/bedita).
 
 ## Installation
 
 1. Download [Composer](https://getcomposer.org/doc/00-intro.md) or update `composer self-update`.
-2. Run `php composer.phar create-project --prefer-dist cakephp/app [app_name]`.
+2. Run `composer create-project --prefer-dist chialab/bedita-app-template [app_name]`.
 
 If Composer is installed globally, run
 
 ```bash
-composer create-project --prefer-dist "cakephp/app:^3.8"
+composer create-project --prefer-dist "chialab/bedita-app-template:^4.7"
 ```
 
 In case you want to use a custom app dir name (e.g. `/myapp/`):
 
 ```bash
-composer create-project --prefer-dist "cakephp/app:^3.8" myapp
+composer create-project --prefer-dist "chialab/bedita-app-template:^4.7" myapp
 ```
 
 You can now either use your machine's webserver to view the default home page, or start
