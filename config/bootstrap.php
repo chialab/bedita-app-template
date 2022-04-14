@@ -114,7 +114,7 @@ ini_set('intl.default_locale', Configure::read('App.defaultLocale'));
 /*
  * Register application error and exception handlers.
  */
-$isCli = PHP_SAPI === 'cli';
+$isCli = in_array(PHP_SAPI, ['cli', 'phpdbg'], true);
 if ($isCli) {
     (new ConsoleErrorHandler(Configure::read('Error')))->register();
 } else {
