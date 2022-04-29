@@ -32,6 +32,15 @@ class AppView extends BaseAppView
     {
         parent::initialize();
 
+        $isStaging = Configure::read('StagingSite', false);
+        $this->loadHelper('Chialab/FrontendKit.Manager', [
+            'enabled' => $isStaging,
+            'managerUrl' => Configure::read('Manage.manager.url'),
+        ]);
+        if ($isStaging) {
+            $this->loadHelper('Authentication.Identity');
+        }
+
         if (Configure::check('FrontendPlugin')) {
             $this->setTheme(Configure::read('FrontendPlugin'));
         }
