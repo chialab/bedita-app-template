@@ -14,12 +14,14 @@
  */
 namespace App;
 
+use Authentication\Middleware\AuthenticationMiddleware;
 use Cake\Core\Configure;
 use Cake\Core\Exception\MissingPluginException;
 use Cake\Error\Middleware\ErrorHandlerMiddleware;
 use Cake\Http\BaseApplication;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
+use Chialab\FrontendKit\Authentication\AuthenticationServiceProvider;
 use Chialab\FrontendKit\Middleware\StatusMiddleware;
 
 /**
@@ -42,6 +44,11 @@ class Application extends BaseApplication
             $this->bootstrapCli();
         }
 
+        if (Configure::read('Status.level') === 'on') {
+            // Ensure BEdita to load objects using `published` filter
+            Configure::write('Publish.checkDate', true);
+        }
+
         /*
          * Only try to load DebugKit in development mode
          * Debug Kit should not be installed on a production system
@@ -52,6 +59,7 @@ class Application extends BaseApplication
         }
 
         // Load more plugins here
+        $this->addPlugin('Authentication');
         $this->addPlugin('BEdita/Core');
         $this->addPlugin('BEdita/AWS');
         $this->addPlugin('BEdita/I18n');
@@ -81,6 +89,8 @@ class Application extends BaseApplication
             ]))
 
             ->add(new StatusMiddleware(['BEdita/Core']))
+
+            ->add(new AuthenticationMiddleware(new AuthenticationServiceProvider('/login')))
 
             // Add routing middleware.
             // If you have a large number of routes connected, turning on routes

@@ -11,6 +11,7 @@
         "bedita/aws": "^2.0",
         "bedita/core": "^4.7",
         "bedita/i18n": "^3.2",
+        "cakephp/authentication": "^1.0",
         "cakephp/cakephp": "^3.10",
         "cakephp/migrations": "^2.0.0",
         "cakephp/plugin-installer": "^1.3",
