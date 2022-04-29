@@ -9,11 +9,21 @@ use Cake\Http\Response;
 /**
  * Auth Controller
  *
- *
- * @method \App\Model\Entity\Auth[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
+ * @property \Authentication\Controller\Component\AuthenticationComponent $Authentication
  */
 class AuthController extends AppController
 {
+    /**
+     * @inheritDoc
+     */
+    public function initialize()
+    {
+        parent::initialize();
+
+        $this->loadComponent('Authentication.Authentication');
+        $this->Authentication->allowUnauthenticated(['login']);
+    }
+
     /**
      * @inheritDoc
      *
@@ -26,8 +36,6 @@ class AuthController extends AppController
         if (!Configure::read('StagingSite')) {
             return $this->redirect($this->getHomeRoute());
         }
-
-        $this->Authentication->allowUnauthenticated(['login']);
 
         return null;
     }
