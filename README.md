@@ -1,6 +1,4 @@
-# CakePHP Application Skeleton
-
-[![Total Downloads](https://img.shields.io/packagist/dt/chialab/bedita-app-template.svg?style=flat-square)](https://packagist.org/packages/chialab/bedita-app-template)
+# BEdita Application Skeleton
 
 A skeleton for creating applications with [BEdita](https://www.bedita.com) 4.x.
 
