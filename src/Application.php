@@ -20,6 +20,7 @@ use Cake\Error\Middleware\ErrorHandlerMiddleware;
 use Cake\Http\BaseApplication;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
+use Chialab\FrontendKit\Middleware\ExceptionWrapperMiddleware;
 use Chialab\FrontendKit\Middleware\StatusMiddleware;
 
 /**
@@ -74,6 +75,8 @@ class Application extends BaseApplication
             // Catch any exceptions in the lower layers,
             // and make an error page/response
             ->add(new ErrorHandlerMiddleware(null, Configure::read('Error')))
+
+            ->add(new ExceptionWrapperMiddleware())
 
             // Handle plugin/theme assets like CakePHP normally does.
             ->add(new AssetMiddleware([
