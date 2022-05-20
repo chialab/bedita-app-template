@@ -76,6 +76,7 @@ class Application extends BaseApplication
             // and make an error page/response
             ->add(new ErrorHandlerMiddleware(null, Configure::read('Error')))
 
+            // Add base exception handling middleware
             ->add(new ExceptionWrapperMiddleware())
 
             // Handle plugin/theme assets like CakePHP normally does.
