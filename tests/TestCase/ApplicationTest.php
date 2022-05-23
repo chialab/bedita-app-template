@@ -24,8 +24,8 @@ use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
+use Chialab\FrontendKit\Middleware\ExceptionWrapperMiddleware;
 use Chialab\FrontendKit\Middleware\StatusMiddleware;
-use InvalidArgumentException;
 
 /**
  * Test {@see \App\Application} class.
@@ -123,6 +123,7 @@ class ApplicationTest extends TestCase
     {
         $expectedMiddlewares = [
             ErrorHandlerMiddleware::class,
+            ExceptionWrapperMiddleware::class,
             AssetMiddleware::class,
             StatusMiddleware::class,
             RoutingMiddleware::class,
