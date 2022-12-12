@@ -23,7 +23,7 @@
     "@chialab/rna-dev-server": "^0.15.0",
     "@chialab/stylelint-config": "^2.0.0",
     "eslint": "^8.0.0",
-    "eslint-plugin-jsdoc": "^38.1.3",
+    "eslint-plugin-jsdoc": "^39.6.4",
     "stylelint": "^14.0.0",
     "typescript": "^4.5.5"
   }
