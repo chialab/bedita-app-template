@@ -16,7 +16,7 @@ variables:
 # Tests
 ###
 .composer:
-  image: chialab/php:7.4
+  image: chialab/php:8.1
   variables:
     COMPOSER_CACHE_DIR: "${CI_PROJECT_DIR}/.cache/composer"
   cache:

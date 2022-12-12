@@ -47,3 +47,7 @@ Thumbs.db
 nbproject/*
 # Visual Studio Code
 .vscode
+
+# PHPUnit #
+###########
+.phpunit.result.cache

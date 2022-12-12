@@ -15,7 +15,13 @@
     <arg name="extensions" value="php" />
     <arg name="ignore" value="*/Migrations/*" />
 
-    <config name="installed_paths" value="../../cakephp/cakephp-codesniffer"/>
+    <config name="installed_paths" value="../../cakephp/cakephp-codesniffer,../../slevomat/coding-standard"/>
 
     <rule ref="CakePHP"/>
+    <rule ref="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat">
+        <properties>
+            <property name="shortNullable" type="string" value="no"/>
+            <property name="nullPosition" type="string" value="last"/>
+        </properties>
+    </rule>
 </ruleset>
