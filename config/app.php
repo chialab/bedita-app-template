@@ -518,6 +518,7 @@ return [
         'generators' => [
             'default' => [
                 'className' => 'BEdita/Core.Glide',
+                'driver' => 'imagick',
                 // 'cache' => 'thumbnails',
                 'url' => env('THUMBNAILS_DEFAULT_URL', null),
             ],
