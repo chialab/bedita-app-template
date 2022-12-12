@@ -14,16 +14,17 @@
  */
 namespace App\Error;
 
+use Cake\Controller\Controller;
 use Cake\Core\App;
 use Cake\Core\Configure;
-use Cake\Error\ExceptionRenderer;
+use Cake\Error\Renderer\WebExceptionRenderer;
 
-class AppExceptionRenderer extends ExceptionRenderer
+class AppExceptionRenderer extends WebExceptionRenderer
 {
     /**
      * @inheritDoc
      */
-    protected function _getController()
+    protected function _getController(): Controller
     {
         if ($this->error->getCode() < 400 || $this->error->getCode() >= 500) {
             return parent::_getController();
