@@ -46,8 +46,21 @@ return [
             'username' => 'my_app',
             'password' => 'secret',
             'database' => 'my_app',
-            'log' => true,
+            // 'log' => true,
             'url' => env('DATABASE_URL', null),
+        ],
+
+        /*
+         * The test connection is used during the test suite.
+         */
+        'test' => [
+            'host' => 'localhost',
+            //'port' => 'non_standard_port_number',
+            'username' => 'my_app',
+            'password' => 'secret',
+            'database' => 'test_myapp',
+            // 'log' => true,
+            'url' => env('DATABASE_TEST_URL', 'sqlite://127.0.0.1/tests.sqlite'),
         ],
     ],
 

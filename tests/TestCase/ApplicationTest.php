@@ -19,12 +19,17 @@ namespace App\Test\TestCase;
 use App\Application;
 use Cake\Core\Configure;
 use Cake\Core\Plugin;
+use Cake\Core\PluginInterface;
 use Cake\Error\Middleware\ErrorHandlerMiddleware;
+use Cake\Http\Middleware\BodyParserMiddleware;
+use Cake\Http\Middleware\CsrfProtectionMiddleware;
 use Cake\Http\MiddlewareQueue;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
+use Chialab\FrontendKit\Middleware\ExceptionWrapperMiddleware;
+use Chialab\FrontendKit\Middleware\StatusMiddleware;
 
 /**
  * Test {@see \App\Application} class.
@@ -128,6 +133,8 @@ class ApplicationTest extends TestCase
             AssetMiddleware::class,
             StatusMiddleware::class,
             RoutingMiddleware::class,
+            BodyParserMiddleware::class,
+            CsrfProtectionMiddleware::class,
         ];
 
         $app = new Application(dirname(dirname(__DIR__)) . '/config');

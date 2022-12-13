@@ -58,16 +58,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.252.6",
+            "version": "3.253.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "92b929f7552c2ed65d52875dbf1c5ce9833d567d"
+                "reference": "1fc9d166dd8ee7c2a187cf8f3ed9342863208865"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/92b929f7552c2ed65d52875dbf1c5ce9833d567d",
-                "reference": "92b929f7552c2ed65d52875dbf1c5ce9833d567d",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/1fc9d166dd8ee7c2a187cf8f3ed9342863208865",
+                "reference": "1fc9d166dd8ee7c2a187cf8f3ed9342863208865",
                 "shasum": ""
             },
             "require": {
@@ -146,22 +146,22 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.252.6"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.253.0"
             },
-            "time": "2022-12-09T19:21:09+00:00"
+            "time": "2022-12-12T19:23:54+00:00"
         },
         {
             "name": "bedita/api",
-            "version": "v5.1.0",
+            "version": "v5.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bedita/api.git",
-                "reference": "f4e9d6b0179bd7cf7c93c8b79c8a8b23f4bf7367"
+                "reference": "f4f91bfc91bea7d9359bc381593d8ce1fe78842c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bedita/api/zipball/f4e9d6b0179bd7cf7c93c8b79c8a8b23f4bf7367",
-                "reference": "f4e9d6b0179bd7cf7c93c8b79c8a8b23f4bf7367",
+                "url": "https://api.github.com/repos/bedita/api/zipball/f4f91bfc91bea7d9359bc381593d8ce1fe78842c",
+                "reference": "f4f91bfc91bea7d9359bc381593d8ce1fe78842c",
                 "shasum": ""
             },
             "require": {
@@ -213,7 +213,7 @@
                 "issues": "https://github.com/bedita/bedita/issues",
                 "source": "https://github.com/bedita/bedita"
             },
-            "time": "2022-10-27T10:56:13+00:00"
+            "time": "2022-12-13T09:16:13+00:00"
         },
         {
             "name": "bedita/aws",
@@ -267,16 +267,16 @@
         },
         {
             "name": "bedita/core",
-            "version": "v5.1.0",
+            "version": "v5.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bedita/core.git",
-                "reference": "83d33e8163164142363dbf070deb9adc7afbd706"
+                "reference": "7620c130cc9e902a95bcf8c515a4e4ce10adb498"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bedita/core/zipball/83d33e8163164142363dbf070deb9adc7afbd706",
-                "reference": "83d33e8163164142363dbf070deb9adc7afbd706",
+                "url": "https://api.github.com/repos/bedita/core/zipball/7620c130cc9e902a95bcf8c515a4e4ce10adb498",
+                "reference": "7620c130cc9e902a95bcf8c515a4e4ce10adb498",
                 "shasum": ""
             },
             "require": {
@@ -330,7 +330,7 @@
                 "issues": "https://github.com/bedita/bedita/issues",
                 "source": "https://github.com/bedita/bedita"
             },
-            "time": "2022-10-27T10:56:47+00:00"
+            "time": "2022-12-13T09:16:47+00:00"
         },
         {
             "name": "bedita/i18n",
@@ -853,12 +853,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/chialab/bedita-frontend-kit.git",
-                "reference": "7c99a321ac1bd3399839c369b04a216a2ff21459"
+                "reference": "949bf1fd914590a298f7e684df898af192ae55a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/chialab/bedita-frontend-kit/zipball/7c99a321ac1bd3399839c369b04a216a2ff21459",
-                "reference": "7c99a321ac1bd3399839c369b04a216a2ff21459",
+                "url": "https://api.github.com/repos/chialab/bedita-frontend-kit/zipball/949bf1fd914590a298f7e684df898af192ae55a9",
+                "reference": "949bf1fd914590a298f7e684df898af192ae55a9",
                 "shasum": ""
             },
             "require": {
@@ -892,7 +892,7 @@
                 "issues": "https://github.com/chialab/bedita-frontend-kit/issues",
                 "source": "https://github.com/chialab/bedita-frontend-kit/tree/3.x.x"
             },
-            "time": "2022-12-12T14:30:43+00:00"
+            "time": "2022-12-13T11:34:19+00:00"
         },
         {
             "name": "chialab/ip",
@@ -5704,16 +5704,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.9.2",
+            "version": "1.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "d6fdf01c53978b6429f1393ba4afeca39cc68afa"
+                "reference": "709999b91448d4f2bb07daffffedc889b33e461c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/d6fdf01c53978b6429f1393ba4afeca39cc68afa",
-                "reference": "d6fdf01c53978b6429f1393ba4afeca39cc68afa",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/709999b91448d4f2bb07daffffedc889b33e461c",
+                "reference": "709999b91448d4f2bb07daffffedc889b33e461c",
                 "shasum": ""
             },
             "require": {
@@ -5743,7 +5743,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/1.9.2"
+                "source": "https://github.com/phpstan/phpstan/tree/1.9.3"
             },
             "funding": [
                 {
@@ -5759,20 +5759,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-11-10T09:56:11+00:00"
+            "time": "2022-12-13T10:28:10+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "9.2.19",
+            "version": "9.2.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "c77b56b63e3d2031bd8997fcec43c1925ae46559"
+                "reference": "af7463c955007de36db0c5e26d03e2f933c2e980"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/c77b56b63e3d2031bd8997fcec43c1925ae46559",
-                "reference": "c77b56b63e3d2031bd8997fcec43c1925ae46559",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/af7463c955007de36db0c5e26d03e2f933c2e980",
+                "reference": "af7463c955007de36db0c5e26d03e2f933c2e980",
                 "shasum": ""
             },
             "require": {
@@ -5828,7 +5828,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/9.2.19"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/9.2.20"
             },
             "funding": [
                 {
@@ -5836,7 +5836,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-11-18T07:47:47+00:00"
+            "time": "2022-12-13T07:49:28+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",

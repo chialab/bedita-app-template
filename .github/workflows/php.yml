@@ -83,7 +83,7 @@ jobs:
     env:
       PHP_VERSION: '${{ matrix.php }}'
       MYSQL_VERSION: '${{ matrix.mysql }}'
-      db_dsn: 'mysql://bedita:bedita@127.0.0.1:3306/bedita?realVendor=mysql${{ matrix.mysql }}'
+      DATABASE_TEST_URL: 'mysql://bedita:bedita@127.0.0.1:3306/bedita?realVendor=mysql${{ matrix.mysql }}'
 
     services:
       db:
@@ -120,6 +120,8 @@ jobs:
             composer-
       - name: 'Install dependencies with Composer'
         run: 'composer install --prefer-dist --no-interaction'
+      - name: 'Configure app'
+        run: 'cp config/app_local.example.php config/app_local.php '
       - name: 'Run PHPUnit'
         run: 'phpdbg -qrr vendor/bin/phpunit --coverage-clover=clover.xml'
       - name: 'Export coverage results'
