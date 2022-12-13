@@ -39,37 +39,33 @@ class ErrorController extends AppController
     /**
      * beforeFilter callback.
      *
-     * @param \Cake\Event\EventInterface $event Event.
-     * @return \Cake\Http\Response|null|void
+     * @param \Cake\Event\EventInterface<\Cake\Controller\Controller> $event Event.
+     * @return void
      */
-    public function beforeFilter(EventInterface $event): Response|null
+    public function beforeFilter(EventInterface $event): void
     {
-        return null;
     }
 
     /**
      * beforeRender callback.
      *
      * @param \Cake\Event\EventInterface $event Event.
-     * @return \Cake\Http\Response|null|void
+     * @return void
      */
-    public function beforeRender(EventInterface $event): Response|null
+    public function beforeRender(EventInterface $event): void
     {
         parent::beforeRender($event);
 
         $this->viewBuilder()->setTemplatePath('Error');
-
-        return null;
     }
 
     /**
      * afterFilter callback.
      *
      * @param \Cake\Event\EventInterface $event Event.
-     * @return \Cake\Http\Response|null|void
+     * @return void
      */
-    public function afterFilter(EventInterface $event): Response|null
+    public function afterFilter(EventInterface $event): void
     {
-        return null;
     }
 }
