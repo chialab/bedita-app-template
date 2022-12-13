@@ -62,6 +62,8 @@ jobs:
             composer-
       - name: 'Install dependencies with Composer'
         run: 'composer install --prefer-dist --no-interaction'
+      - name: 'Configure app'
+        run: 'cp config/app_local.example.php config/app_local.php '
       - name: 'Run PHP STAN'
         run: composer run-script stan
 
