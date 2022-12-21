@@ -127,6 +127,9 @@ class ApplicationTest extends TestCase
      */
     public function testMiddleware()
     {
+        Configure::write('debug', false);
+        Configure::write('FrontendPlugin', 'BEdita/App');
+
         $expectedMiddlewares = [
             ErrorHandlerMiddleware::class,
             ExceptionWrapperMiddleware::class,

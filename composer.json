@@ -57,7 +57,8 @@
         "cs-check": "phpcs",
         "cs-fix": "phpcbf",
         "stan": "phpstan analyse",
-        "test": "phpunit --colors=always"
+        "test": "phpunit --colors=always",
+        "gettext": "bin/cake gettext update"
     },
     "prefer-stable": true,
     "config": {
