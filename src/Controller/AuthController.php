@@ -50,7 +50,7 @@ class AuthController extends AppController
             return $this->redirect($this->Authentication->getLoginRedirect() ?? $this->getHomeRoute());
         }
 
-        if ($this->request->is('post') && !$result->isValid()) {
+        if ($this->request->is('post')) {
             $this->Flash->error(__('Incorrect username or password'));
         }
 
