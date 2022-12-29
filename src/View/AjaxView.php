@@ -29,9 +29,7 @@ class AjaxView extends AppView
     protected $layout = 'ajax';
 
     /**
-     * Initialization hook method.
-     *
-     * @return void
+     * @inheritDoc
      */
     public function initialize(): void
     {

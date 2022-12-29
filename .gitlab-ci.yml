@@ -110,7 +110,7 @@ test:css:lint:
 # Build
 ###
 build:assets: # build JS and CSS assets
-  needs: []
+  needs: ['dependencies']
   stage: build
   only:
     - main

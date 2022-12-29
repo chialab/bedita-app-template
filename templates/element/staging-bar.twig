@@ -1,0 +1,27 @@
+{% if _staging|default(false) %}
+    {% set url = Manager.getViewUrl() %}
+
+    <div class="staging-bar">
+        <span>{{ __('User IP') }}: {{ _view.request.clientIp() }}</span>
+        {% if Identity.isLoggedIn() %}
+            |
+            {% set name = Identity.get('name') ? Identity.get('name') ~ ' ' ~ Identity.get('surname') : Identity.get('username') %}
+            <span>{{ __('Logged in as')|raw }}: <strong class="bold">{{ name }}</strong></span>
+        {% endif %}
+        {% if Identity.isLoggedIn() %}
+            {% if object is defined %}
+                |
+                <a class="link link--highlight"
+                    title="{{ __('edit this {0}', object.type)|raw|escape('html_attr') }}"
+                    href="{{ url|escape('html_attr') }}"
+                    target="_blank">
+                    {{ __('View in BEdita')|raw }}
+                </a>
+            {% endif %}
+            |
+            <a class="link link--highlight" href="/logout">
+                {{ __('logout')|capitalize|raw }}
+            </a>
+        {% endif %}
+    </div>
+{% endif %}

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Cake\Controller\Controller;
+use Cake\Core\Configure;
 
 /**
  * Application Controller
@@ -50,6 +51,8 @@ class AppController extends Controller
             'publication' => static::ROOT_FOLDER,
         ]);
         $this->loadComponent('Chialab/FrontendKit.Menu');
-        $this->loadComponent('Chialab/FrontendKit.Staging');
+        if (Configure::read('StagingSite')) {
+            $this->loadComponent('Chialab/FrontendKit.Staging');
+        }
     }
 }

@@ -26,6 +26,12 @@ use Cake\Routing\Route\DashedRoute;
 use Cake\Routing\RouteBuilder;
 
 return static function (RouteBuilder $routes): void {
+    $routes->connect(
+        '/',
+        ['controller' => 'Pages', 'action' => 'home'],
+        ['_name' => 'pages:home']
+    );
+
     /*
      * The default class to use for all routes
      *
