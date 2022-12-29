@@ -32,6 +32,18 @@ return static function (RouteBuilder $routes): void {
         ['_name' => 'pages:home']
     );
 
+    $routes->connect(
+        '/login',
+        ['controller' => 'Auth', 'action' => 'login'],
+        ['_name' => 'auth:login']
+    );
+
+    $routes->connect(
+        '/logout',
+        ['controller' => 'Auth', 'action' => 'logout'],
+        ['_name' => 'auth:logout']
+    );
+
     /*
      * The default class to use for all routes
      *
