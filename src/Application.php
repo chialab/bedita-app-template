@@ -16,7 +16,11 @@ declare(strict_types=1);
  */
 namespace App;
 
+use Authentication\Middleware\AuthenticationMiddleware;
+use Authorization\Middleware\AuthorizationMiddleware;
 use BEdita\API\App\BaseApplication;
+use BEdita\API\Middleware\ApplicationMiddleware;
+use BEdita\API\Middleware\LoggedUserMiddleware;
 use Cake\Core\Configure;
 use Cake\Core\ContainerInterface;
 use Cake\Datasource\FactoryLocator;
@@ -27,6 +31,7 @@ use Cake\Http\MiddlewareQueue;
 use Cake\ORM\Locator\TableLocator;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
+use Chialab\FrontendKit\Authentication\AuthenticationServiceProvider;
 use Chialab\FrontendKit\Middleware\ExceptionWrapperMiddleware;
 use Chialab\FrontendKit\Middleware\StatusMiddleware;
 
@@ -87,23 +92,51 @@ class Application extends BaseApplication
      */
     public function middleware($middlewareQueue): MiddlewareQueue
     {
-        $middlewareQueue = parent::middleware($middlewareQueue)
+        $middlewareQueue
+            // Catch any exceptions in the lower layers,
+            // and make an error page/response
+            ->add(new ErrorHandlerMiddleware(Configure::read('Error')))
 
-            // Handle plugin/theme assets like CakePHP normally does.
-            ->insertBefore(
-                RoutingMiddleware::class,
-                new AssetMiddleware([
-                    'cacheTime' => Configure::read('Asset.cacheTime'),
-                ]),
-            )
+            ->add(new AssetMiddleware([
+                'cacheTime' => Configure::read('Asset.cacheTime'),
+            ]))
 
-            ->insertBefore(
-                RoutingMiddleware::class,
-                new StatusMiddleware(['BEdita/Core']),
-            );
+            ->add(new StatusMiddleware(['BEdita/Core']))
+
+            // Add routing middleware.
+            ->add(new RoutingMiddleware($this))
+
+            // Parse various types of encoded request bodies so that they are
+            // available as array through $request->getData()
+            // https://book.cakephp.org/4/en/controllers/middleware.html#body-parser-middleware
+            ->add(new BodyParserMiddleware());
 
         if (Configure::read('FrontendPlugin') === 'BEdita/API') {
-            return $middlewareQueue;
+            return $middlewareQueue
+                // Add the AuthenticationMiddleware.
+                // It should be after routing and body parser.
+                ->add(new AuthenticationMiddleware($this))
+
+                // Setup current BEdita application.
+                // It should be after AuthenticationMiddleware.
+                ->add(new ApplicationMiddleware([
+                    'blockAnonymousApps' => Configure::read('Security.blockAnonymousApps', true),
+                ]))
+
+                // Setup current logged user.
+                // It should be after AuthenticationMiddleware.
+                ->add(new LoggedUserMiddleware())
+
+                // Add the AuthorizationMiddleware *after* routing, body parser
+                // and authentication middleware.
+                ->add(new AuthorizationMiddleware($this));
+        }
+
+        if (Configure::read('StagingSite', false)) {
+            $middlewareQueue
+                // Add the AuthenticationMiddleware.
+                // It should be after routing and body parser.
+                ->add(new AuthenticationMiddleware(new AuthenticationServiceProvider('/login')));
         }
 
         return $middlewareQueue
