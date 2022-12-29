@@ -8,6 +8,7 @@ use Cake\Http\Response;
 
 /**
  * Auth Controller.
+ *
  * @property \Authentication\Controller\Component\AuthenticationComponent $Authentication
  */
 class AuthController extends AppController

@@ -59,6 +59,7 @@ class ApplicationTest extends TestCase
     public function testBootstrapInDebug()
     {
         Configure::write('debug', true);
+        Configure::write('StagingSite', false);
         Configure::write('FrontendPlugin', null);
 
         $expectedPlugins = [
@@ -94,6 +95,7 @@ class ApplicationTest extends TestCase
     public function testBootstrap()
     {
         Configure::write('debug', false);
+        Configure::write('StagingSite', false);
         Configure::write('FrontendPlugin', 'BEdita/API');
 
         $expectedPlugins = [
@@ -128,6 +130,7 @@ class ApplicationTest extends TestCase
     public function testMiddleware()
     {
         Configure::write('debug', false);
+        Configure::write('StagingSite', false);
         Configure::write('FrontendPlugin', 'BEdita/App');
 
         $expectedMiddlewares = [
