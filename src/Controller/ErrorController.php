@@ -26,9 +26,7 @@ use Cake\Event\EventInterface;
 class ErrorController extends AppController
 {
     /**
-     * Initialization hook method.
-     *
-     * @return void
+     * @inheritDoc
      */
     public function initialize(): void
     {
@@ -36,20 +34,14 @@ class ErrorController extends AppController
     }
 
     /**
-     * beforeFilter callback.
-     *
-     * @param \Cake\Event\EventInterface<\Cake\Controller\Controller> $event Event.
-     * @return void
+     * @inheritDoc
      */
     public function beforeFilter(EventInterface $event): void
     {
     }
 
     /**
-     * beforeRender callback.
-     *
-     * @param \Cake\Event\EventInterface<\Cake\Controller\Controller> $event Event.
-     * @return void
+     * @inheritDoc
      */
     public function beforeRender(EventInterface $event): void
     {
@@ -59,10 +51,7 @@ class ErrorController extends AppController
     }
 
     /**
-     * afterFilter callback.
-     *
-     * @param \Cake\Event\EventInterface<\Cake\Controller\Controller> $event Event.
-     * @return void
+     * @inheritDoc
      */
     public function afterFilter(EventInterface $event): void
     {

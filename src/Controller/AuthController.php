@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Cake\Http\Response;
 
 /**
  * Auth Controller.
+ * @property \Authentication\Controller\Component\AuthenticationComponent $Authentication
  */
 class AuthController extends AppController
 {
@@ -27,9 +27,7 @@ class AuthController extends AppController
      */
     public function beforeFilter(EventInterface $event): Response|null
     {
-        parent::beforeFilter($event);
-
-        if (!Configure::read('StagingSite')) {
+        if (!$this->Staging->isAuthRequired()) {
             return $this->redirect($this->getHomeRoute());
         }
 

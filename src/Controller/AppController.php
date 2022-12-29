@@ -27,13 +27,7 @@ class AppController extends Controller
     protected const ROOT_FOLDER = 'root';
 
     /**
-     * Initialization hook method.
-     *
-     * Use this method to add common initialization code like loading components.
-     *
-     * e.g. `$this->loadComponent('FormProtection');`
-     *
-     * @return void
+     * @inheritDoc
      */
     public function initialize(): void
     {

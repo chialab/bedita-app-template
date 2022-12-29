@@ -67,11 +67,6 @@ class Application extends BaseApplication
             $this->addPlugin('DebugKit');
         }
 
-        if (Configure::read('Status.level') === 'on') {
-            // Ensure BEdita to load objects using `published` filter
-            Configure::write('Publish.checkDate', true);
-        }
-
         $this->addPlugin('BEdita/Core');
         $this->addPlugin('BEdita/AWS');
         $this->addPlugin('BEdita/I18n');
