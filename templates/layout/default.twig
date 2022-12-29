@@ -8,8 +8,8 @@
         <meta name="msapplication-tap-highlight" content="no"/>
         <meta name="theme-color" content="#ffffff" />
         <meta name="developer" content="ChiaLab | communication design | www.chialab.it" />
-        <title>{{ Metadata.getTitle()|striptags|raw }}</title>
-        <meta name="description" content="{{ Metadata.getDescription()|striptags|raw }}" />
+        <title>{{ Metadata.getTitle(object|default(null), publication)|striptags|raw }}</title>
+        <meta name="description" content="{{ Metadata.getDescription(object|default(null), publication)|striptags|raw }}" />
 
         {{ Html.meta('icon', "#{_view.plugin}.favicon.png", { type:'image/png' } )|raw }}
 
