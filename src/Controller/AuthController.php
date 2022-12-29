@@ -25,7 +25,7 @@ class AuthController extends AppController
     /**
      * @inheritDoc
      */
-    public function beforeFilter(EventInterface $event): ?Response
+    public function beforeFilter(EventInterface $event): Response|null
     {
         parent::beforeFilter($event);
 
@@ -43,7 +43,7 @@ class AuthController extends AppController
      *
      * @return \Cake\Http\Response|null
      */
-    public function login(): ?Response
+    public function login(): Response|null
     {
         $result = $this->Authentication->getResult();
         if ($result->isValid()) {
@@ -63,7 +63,7 @@ class AuthController extends AppController
      *
      * @return \Cake\Http\Response|null
      */
-    public function logout(): ?Response
+    public function logout(): Response|null
     {
         $this->Authentication->logout();
 

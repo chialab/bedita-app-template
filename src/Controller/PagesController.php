@@ -30,7 +30,7 @@ class PagesController extends AppController
             try {
                 $menu[$key] = $this->Menu->load($uname);
             } catch (RecordNotFoundException) {
-                //
+                // prevent throwing if unable to load menu data
             }
         }
         $this->set(compact('menu'));
