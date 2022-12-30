@@ -14,7 +14,7 @@
         "cakephp/cakephp": "^4.0",
         "cakephp/migrations": "^3.0.0",
         "cakephp/plugin-installer": "^1.3",
-        "chialab/frontend-kit": "3.x-dev as 3.0.0",
+        "chialab/frontend-kit": "^3.0.0",
         "mobiledetect/mobiledetectlib": "2.*"
     },
     "require-dev": {
