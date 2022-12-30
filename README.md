@@ -43,7 +43,7 @@ configuration relevant for your application.
 
 ## Testing
 
-[![GitHub Actions tests](https://github.com/chialab/bedita-app-template/actions/workflows/test.yml/badge.svg?event=push&branch=main)](https://github.com/chialab/bedita-app-template/actions/workflows/test.yml?query=event%3Apush+branch%3Amain)
+[![GitHub Actions tests](https://github.com/chialab/bedita-app-template/actions/workflows/php.yml/badge.svg?event=push&branch=main)](https://github.com/chialab/bedita-app-template/actions/workflows/test.yml?query=event%3Apush+branch%3Amain)
 [![codecov](https://codecov.io/gh/chialab/bedita-app-template/branch/main/graph/badge.svg)](https://codecov.io/gh/chialab/bedita-app-template)
 
 Test database configuration is in `app_local.php`. You can override the database url using the `DATABASE_TEST_URL` environment variable:
