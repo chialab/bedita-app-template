@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
@@ -19,6 +21,8 @@ use Cake\Core\Configure;
 use Cake\Core\Plugin;
 use Cake\Core\PluginInterface;
 use Cake\Error\Middleware\ErrorHandlerMiddleware;
+use Cake\Http\Middleware\BodyParserMiddleware;
+use Cake\Http\Middleware\CsrfProtectionMiddleware;
 use Cake\Http\MiddlewareQueue;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
@@ -52,9 +56,10 @@ class ApplicationTest extends TestCase
      * @return void
      * @covers ::bootstrap()
      */
-    public function testBootstrapDebug(): void
+    public function testBootstrapInDebug()
     {
         Configure::write('debug', true);
+        Configure::write('StagingSite', false);
         Configure::write('FrontendPlugin', null);
 
         $expectedPlugins = [
@@ -68,7 +73,8 @@ class ApplicationTest extends TestCase
             'Migrations',
         ];
 
-        $app = new Application(CONFIG);
+        $app = new Application(dirname(dirname(__DIR__)) . '/config');
+
         static::assertCount(0, $app->getPlugins());
         $app->bootstrap();
         $plugins = $app->getPlugins();
@@ -86,9 +92,10 @@ class ApplicationTest extends TestCase
      * @return void
      * @covers ::bootstrap()
      */
-    public function testBootstrap(): void
+    public function testBootstrap()
     {
         Configure::write('debug', false);
+        Configure::write('StagingSite', false);
         Configure::write('FrontendPlugin', 'BEdita/API');
 
         $expectedPlugins = [
@@ -101,7 +108,8 @@ class ApplicationTest extends TestCase
             'Migrations',
         ];
 
-        $app = new Application(CONFIG);
+        $app = new Application(dirname(dirname(__DIR__)) . '/config');
+
         static::assertCount(0, $app->getPlugins());
         $app->bootstrap();
         $plugins = $app->getPlugins();
@@ -119,23 +127,29 @@ class ApplicationTest extends TestCase
      * @return void
      * @covers ::middleware()
      */
-    public function testMiddleware(): void
+    public function testMiddleware()
     {
+        Configure::write('debug', false);
+        Configure::write('StagingSite', false);
+        Configure::write('FrontendPlugin', 'BEdita/App');
+
         $expectedMiddlewares = [
             ErrorHandlerMiddleware::class,
             ExceptionWrapperMiddleware::class,
             AssetMiddleware::class,
             StatusMiddleware::class,
             RoutingMiddleware::class,
+            BodyParserMiddleware::class,
+            CsrfProtectionMiddleware::class,
         ];
 
-        $app = new Application(CONFIG);
+        $app = new Application(dirname(dirname(__DIR__)) . '/config');
 
         $middlewareQueue = $app->middleware(new MiddlewareQueue());
 
         static::assertSameSize($expectedMiddlewares, $middlewareQueue);
-        foreach ($expectedMiddlewares as $i => $middleware) {
-            static::assertInstanceOf($middleware, $middlewareQueue->get($i));
+        foreach ($middlewareQueue as $i => $middleware) {
+            static::assertInstanceOf($expectedMiddlewares[$i], $middleware);
         }
     }
 }

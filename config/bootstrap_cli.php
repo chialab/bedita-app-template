@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
@@ -24,5 +25,9 @@ use Cake\Core\Configure;
 //Configure::write('App.fullBaseUrl', php_uname('n'));
 
 // Set logs to different files so they don't have permission conflicts.
-Configure::write('Log.debug.file', 'cli-debug');
-Configure::write('Log.error.file', 'cli-error');
+if (Configure::check('Log.debug')) {
+    Configure::write('Log.debug.file', 'cli-debug');
+}
+if (Configure::check('Log.error')) {
+    Configure::write('Log.error.file', 'cli-error');
+}

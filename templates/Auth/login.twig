@@ -1,0 +1,9 @@
+<main>
+    {{ Form.create(null)|raw }}
+        {{ Form.label('usarname', __('Username'), { class: 'bold' })|raw }}
+        {{ Form.input('username', { type: 'text' })|raw }}
+        {{ Form.label('usarname', __('Password'), { class: 'bold' })|raw }}
+        {{ Form.input('password', { type: 'password' })|raw }}
+        <button type="submit">{{ __('log in')|capitalize|raw }}</button>
+    {{ Form.end()|raw }}
+</main>

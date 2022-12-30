@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
@@ -14,8 +16,7 @@
  */
 namespace App\Controller;
 
-use Cake\Event\Event;
-use Cake\Http\Response;
+use Cake\Event\EventInterface;
 
 /**
  * Error Handling Controller
@@ -25,34 +26,34 @@ use Cake\Http\Response;
 class ErrorController extends AppController
 {
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function beforeFilter(Event $event): ?Response
+    public function initialize(): void
     {
-        return null;
+        $this->loadComponent('RequestHandler');
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function beforeRender(Event $event): ?Response
+    public function beforeFilter(EventInterface $event): void
+    {
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function beforeRender(EventInterface $event): void
     {
         parent::beforeRender($event);
 
-        $this->viewBuilder()
-            ->setTemplatePath('Error')
-            ->setLayout('error');
-
-        return null;
+        $this->viewBuilder()->setTemplatePath('Error');
     }
 
     /**
-     * afterFilter callback.
-     *
-     * @param \Cake\Event\Event $event Event.
-     * @return \Cake\Http\Response|null|void
+     * @inheritDoc
      */
-    public function afterFilter(Event $event)
+    public function afterFilter(EventInterface $event): void
     {
     }
 }

@@ -1,6 +1,6 @@
 # BEdita Application Skeleton
 
-A skeleton for creating applications with [BEdita](https://www.bedita.com) 4.x.
+A skeleton for creating applications with [BEdita](https://www.bedita.com) 5.x.
 
 The framework source code can be found here: [bedita/bedita](https://github.com/bedita/bedita).
 
@@ -12,13 +12,13 @@ The framework source code can be found here: [bedita/bedita](https://github.com/
 If Composer is installed globally, run
 
 ```bash
-composer create-project --prefer-dist "chialab/bedita-app-template:^4.7"
+composer create-project --prefer-dist "chialab/bedita-app-template:^5.0"
 ```
 
 In case you want to use a custom app dir name (e.g. `/myapp/`):
 
 ```bash
-composer create-project --prefer-dist "chialab/bedita-app-template:^4.7" myapp
+composer create-project --prefer-dist "chialab/bedita-app-template:^5.0" myapp
 ```
 
 You can now either use your machine's webserver to view the default home page, or start
@@ -40,3 +40,20 @@ automated upgrades, so you have to do any updates manually.
 
 Read and edit `config/app.php` and setup the `'Datasources'` and any other
 configuration relevant for your application.
+
+## Testing
+
+[![GitHub Actions tests](https://github.com/chialab/bedita-app-template/actions/workflows/test.yml/badge.svg?event=push&branch=main)](https://github.com/chialab/bedita-app-template/actions/workflows/test.yml?query=event%3Apush+branch%3Amain)
+[![codecov](https://codecov.io/gh/chialab/bedita-app-template/branch/main/graph/badge.svg)](https://codecov.io/gh/chialab/bedita-app-template)
+
+Test database configuration is in `app_local.php`. You can override the database url using the `DATABASE_TEST_URL` environment variable:
+
+```bash
+export DATABASE_TEST_URL='mysql://root:****@localhost/bedita4_app'
+```
+
+Then, you can launch tests using the `test` composer command:
+
+```bash
+composer run test
+```

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Cake\Controller\Controller;
+use Cake\Core\Configure;
 
 /**
  * Application Controller
@@ -26,13 +27,7 @@ class AppController extends Controller
     protected const ROOT_FOLDER = 'root';
 
     /**
-     * Initialization hook method.
-     *
-     * Use this method to add common initialization code like loading components.
-     *
-     * e.g. `$this->loadComponent('FormProtection');`
-     *
-     * @return void
+     * @inheritDoc
      */
     public function initialize(): void
     {
@@ -50,6 +45,8 @@ class AppController extends Controller
             'publication' => static::ROOT_FOLDER,
         ]);
         $this->loadComponent('Chialab/FrontendKit.Menu');
-        $this->loadComponent('Chialab/FrontendKit.Staging');
+        if (Configure::read('StagingSite')) {
+            $this->loadComponent('Chialab/FrontendKit.Staging');
+        }
     }
 }

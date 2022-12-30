@@ -5,40 +5,23 @@ stages:
   - deploy
 
 variables:
+  AWS_DEFAULT_REGION: 'eu-south-1'
   AWS_WEB_IDENTITY_TOKEN_FILE: '.aws/web-identity-credentials'
-  GITLAB_CI_OIDC_PROVIDER: 'https://gitlab-ci-oidc.chialab.io'
-  GITLAB_CI_OIDC_CLIENT_ID: 'sts.amazonaws.com'
+  PHP_VERSION: '8.1'
   # ECR_REGISTRY: '000000000000.dkr.ecr.eu-west-1.amazonaws.com'
   # ECR_IMAGE: "${ECR_REGISTRY}/bedita-app"
-  IMAGE_TAG: "${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
 
 ###
-# Tests
+# Setup
 ###
 .composer:
-  image: chialab/php:7.4
+  image: "chialab/php:${PHP_VERSION}"
   variables:
     COMPOSER_CACHE_DIR: "${CI_PROJECT_DIR}/.cache/composer"
   cache:
     key: "composer-${CI_COMMIT_REF_SLUG}"
     paths:
       - .cache/composer
-test:php:cs:
-  needs: []
-  stage: test
-  extends: .composer
-  before_script:
-    - composer install --prefer-dist
-  script:
-    - composer run-script cs-check -- -n
-test:php:stan:
-  needs: []
-  stage: test
-  extends: .composer
-  before_script:
-    - composer install --prefer-dist
-  script:
-    - composer run-script stan
 
 .yarn:
   image: node:lts
@@ -51,30 +34,97 @@ test:php:stan:
     key: "yarn-${CI_COMMIT_REF_SLUG}"
     paths:
       - .cache/yarn
-test:js:lint:
+
+dependencies:
   needs: []
   stage: test
-  allow_failure: true
-  extends: .yarn
+  only:
+    - main
+    - merge_requests
+  extends: .composer
   script:
-    -  yarn run lint:js
-test:css:lint:
-  needs: []
-  stage: test
-  allow_failure: true
-  extends: .yarn
-  script:
-    - yarn run lint:css
+    - composer install --no-dev --no-cache --prefer-dist
+  artifacts:
+    paths:
+      - ./vendor
+    expire_in: 1 day
 
 ###
-# Build Docker image
+# Tests
+###
+test:php:cs:
+  needs: ['dependencies']
+  stage: test
+  only:
+    - main
+    - merge_requests
+  extends: .composer
+  before_script:
+    - composer install --prefer-dist
+  script:
+    - composer run-script cs-check -- -n
+
+test:php:stan:
+  needs: ['dependencies']
+  stage: test
+  only:
+    - main
+    - merge_requests
+  extends: .composer
+  services:
+    - name: mysql:8.0
+      variables:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: test
+  variables:
+    DATABASE_TEST_URL: 'mysql://root:root@mysql:3306/test'
+  before_script:
+    - composer install --prefer-dist
+  script:
+    - composer run-script stan
+
+test:php:gettext:
+  needs: ['dependencies']
+  stage: test
+  only:
+    - main
+    - merge_requests
+  extends: .composer
+  before_script:
+    - apt-get update && apt-get install -y gettext
+    - composer install --prefer-dist
+  script:
+    - composer run-script gettext -- --ci
+
+test:js:lint:
+  needs: ['dependencies']
+  stage: test
+  only:
+    - main
+    - merge_requests
+  extends: .yarn
+  script:
+    -  yarn run lint:scripts
+
+test:css:lint:
+  needs: ['dependencies']
+  stage: test
+  only:
+    - main
+    - merge_requests
+  extends: .yarn
+  script:
+    - yarn run lint:styles
+
+###
+# Build
 ###
 build:assets: # build JS and CSS assets
-  needs: []
+  needs: ['dependencies']
   stage: build
   only:
     - main
-    - tags
+    - merge_requests
   extends: .yarn
   script:
     - yarn build
@@ -84,68 +134,68 @@ build:assets: # build JS and CSS assets
       - ./webroot/build
     expire_in: 1 day
 
-.docker:
-  needs: ['build:assets']
+build:env:
+  needs: []
   stage: build
+  only:
+    - main
+    - merge_requests
+  image: alpine:3
+  interruptible: true
+  variables:
+    GIT_STRATEGY: none
+  artifacts:
+    reports:
+      dotenv: .env
+  script:
+    - '([ -n "${CI_COMMIT_TAG}" ] && printf "IMAGE_TAG=%s" "${CI_COMMIT_TAG}" || ([ -n "${CI_MERGE_REQUEST_IID}" ] && printf "IMAGE_TAG=mr-%s.%s" "${CI_MERGE_REQUEST_IID}" "${CI_COMMIT_SHORT_SHA}" || printf "IMAGE_TAG=%s%s.%s" "$(test ${CI_COMMIT_REF_SLUG} = main && echo ''test-'' || echo ''dev-'')" "${CI_COMMIT_REF_SLUG}" "${CI_COMMIT_SHORT_SHA}")) > .env'
+
+build:docker:
+  needs:
+    - job: 'build:env'
+      artifacts: true
+    - 'build:assets'
+  stage: build
+  only:
+    - main
+    - merge_requests
+  parallel:
+    matrix:
+      - IMAGE: [app, web]
   image: ghcr.io/chialab/docker-buildx-ecr:1
   variables:
-    DOCKER_HOST: 'tcp://docker:2376'
-    DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
-    DOCKER_TLS_CERTDIR: '/certs'
-    DOCKER_TLS_VERIFY: 1
+    DOCKER_HOST: 'tcp://docker:2375'
     PLATFORM: 'linux/amd64,linux/arm64'
-    BASE_IMAGE: 'chialab/php'
   services:
-    - docker:dind
+    - name: docker:dind
+      variables:
+        DOCKER_TLS_CERTDIR: ''
   before_script:
-    - |
-      if [ -n "${ECR_REGISTRY}" ]; then
-        apk add --update --no-cache curl
-        mkdir -p "$(dirname "${AWS_WEB_IDENTITY_TOKEN_FILE}")"
-        curl -s -X POST "${GITLAB_CI_OIDC_PROVIDER}/token" -H "Authorization: Bearer ${CI_JOB_JWT}" -H "Content-Type: application/json" -d "{\"client_id\":\"${GITLAB_CI_OIDC_CLIENT_ID}\",\"grant_type\":\"client_credentials\"}" > "${AWS_WEB_IDENTITY_TOKEN_FILE}"
-        aws-ecr-get-login-password | docker login --username AWS --password-stdin "${ECR_REGISTRY}")
-      else
-        docker login -u "${CI_REGISTRY_USER}" --password-stdin "${CI_REGISTRY}" <<< "${CI_REGISTRY_PASSWORD}"
-      fi
-    - 'docker run --rm --privileged multiarch/qemu-user-static --reset -p yes'
-    - 'docker context create --docker "host=${DOCKER_HOST},ca=/certs/client/ca.pem,cert=/certs/client/cert.pem,key=/certs/client/key.pem" multi-arch'
+    - 'echo "${CI_REGISTRY_PASSWORD}" | docker login -u "${CI_REGISTRY_USER}" --password-stdin "${CI_REGISTRY}"'
+    - 'mkdir -p "$(dirname "${AWS_WEB_IDENTITY_TOKEN_FILE}")" && echo "${CI_JOB_JWT_V2}" > "${AWS_WEB_IDENTITY_TOKEN_FILE}"'
+    - 'aws-ecr-get-login-password | docker login --username AWS --password-stdin "${ECR_REGISTRY}"'
+    - 'docker run --privileged tonistiigi/binfmt --install all'
+    - 'docker context create multi-arch'
     - 'docker --context multi-arch buildx create --use'
   script:
-    - 'docker --context multi-arch buildx build --platform "${PLATFORM}" --build-arg BASE_IMAGE -t "${ECR_IMAGE:-$CI_REGISTRY_IMAGE}${IMAGE_SUFFIX}:${IMAGE_TAG}" --file "${DOCKERFILE}" --push .'
-build:docker:app:
-  extends: .docker
-  variables:
-    IMAGE_SUFFIX: "/app"
-    DOCKERFILE: Dockerfile.app
-  only:
-    - main
-    - tags
-build:docker:web:
-  extends: .docker
-  variables:
-    IMAGE_SUFFIX: "/web"
-    DOCKERFILE: Dockerfile.web
-  only:
-    - main
-    - tags
+    - 'docker --context multi-arch buildx build --cache-to "type=registry,mode=max,ref=${CI_REGISTRY_IMAGE}/${IMAGE}:cache-${CI_COMMIT_REF_SLUG}" --cache-from "type=registry,ref=${CI_REGISTRY_IMAGE}/${IMAGE}:cache-${CI_COMMIT_REF_SLUG}" --platform "${PLATFORM}" --build-arg PHP_VERSION -t "${ECR_IMAGE}/${IMAGE}:${IMAGE_TAG}" --file "Dockerfile.${IMAGE}" --push .'
 
 ###
 # Deploy
 ###
 .deploy:
-  needs: ['build:docker']
+  needs:
+    - job: 'build:env'
+      artifacts: true
+    - 'build:docker'
   stage: deploy
   image:
     name: amazon/aws-cli
     entrypoint:
       - /usr/bin/env
-  variables:
-    LOG_GROUP: "/ecs/${ECS_CLUSTER}"
-    LOG_STREAM_PREFIX: "${ENV_NAME}"
   before_script:
     - 'yum install -y gettext'
-    - 'mkdir -p "$(dirname "${AWS_WEB_IDENTITY_TOKEN_FILE}")"'
-    - 'curl -s -X POST "${GITLAB_CI_OIDC_PROVIDER}/token" -H "Authorization: Bearer ${CI_JOB_JWT}" -H "Content-Type: application/json" -d "{\"client_id\":\"${GITLAB_CI_OIDC_CLIENT_ID}\",\"grant_type\":\"client_credentials\"}" > "${AWS_WEB_IDENTITY_TOKEN_FILE}"'
+    - 'mkdir -p "$(dirname "${AWS_WEB_IDENTITY_TOKEN_FILE}")" && echo "${CI_JOB_JWT_V2}" > "${AWS_WEB_IDENTITY_TOKEN_FILE}"'
   script:
     - export TASK_DEFINITION_ARN="$(aws ecs register-task-definition --cli-input-json "$(envsubst < "deploy/${ENV_NAME}.json")" --output text --query "taskDefinition.taskDefinitionArn")"
     - 'printf "New task definition: %s\n" "${TASK_DEFINITION_ARN}"'
@@ -164,26 +214,31 @@ build:docker:web:
     url: "${ENV_URL}"
 
 # deploy:test:
-#   only:
-#     - main
+#   when: manual
 #   extends: .deploy
 #   variables:
 #     ECS_CLUSTER: 'test'
 #     ECS_SERVICE: 'test-bedita'
-#     TASK_DEFINITION_FAMILY: 'test-bedita'
 #     IAM_ROLE_ARN: 'arn:aws:iam::000000000000:role/test'
+#     TASK_EXECUTION_IAM_ROLE_ARN: 'arn:aws:iam::000000000000:role/test'
+#     CDN_DISTRIBUTION_ID: ''
+#     DATABASE_URL_SECRET: 'arn:aws:ssm:eu-south-1:000000000000:parameter/ecs/000000000000/test/database-url'
+#     SECURITY_SALT_SECRET: 'arn:aws:ssm:eu-south-1:000000000000:parameter/ecs/000000000000/test/security-salt'
 #     ENV_NAME: 'test'
 #     ENV_URL: 'https://test.app.bedita.cloud'
 
 # deploy:production:
 #   only:
-#     - tags
-#   extends: .deploy
+#     - main
 #   when: manual
+#   extends: .deploy
 #   variables:
 #     ECS_CLUSTER: 'production'
 #     ECS_SERVICE: 'prod-bedita'
-#     TASK_DEFINITION_FAMILY: 'prod-bedita'
 #     IAM_ROLE_ARN: 'arn:aws:iam::000000000000:role/prod'
+#     TASK_EXECUTION_IAM_ROLE_ARN: 'arn:aws:iam::000000000000:role/prod'
+#     CDN_DISTRIBUTION_ID: ''
+#     DATABASE_URL_SECRET: 'arn:aws:ssm:eu-south-1:000000000000:parameter/ecs/000000000000/prod/database-url'
+#     SECURITY_SALT_SECRET: 'arn:aws:ssm:eu-south-1:000000000000:parameter/ecs/000000000000/prod/security-salt'
 #     ENV_NAME: 'production'
 #     ENV_URL: 'https://app.bedita.cloud'
