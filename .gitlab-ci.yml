@@ -38,6 +38,9 @@ variables:
 dependencies:
   needs: []
   stage: test
+  only:
+    - main
+    - merge_requests
   extends: .composer
   script:
     - composer install --no-dev --no-cache --prefer-dist
@@ -68,6 +71,13 @@ test:php:stan:
     - main
     - merge_requests
   extends: .composer
+  services:
+    - name: mysql:8.0
+      variables:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: test
+  variables:
+    DATABASE_TEST_URL: 'mysql://root:root@mysql:3306/test'
   before_script:
     - composer install --prefer-dist
   script:
@@ -146,6 +156,9 @@ build:docker:
       artifacts: true
     - 'build:assets'
   stage: build
+  only:
+    - main
+    - merge_requests
   parallel:
     matrix:
       - IMAGE: [app, web]
