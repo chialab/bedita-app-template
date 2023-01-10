@@ -28,14 +28,6 @@ class ErrorController extends AppController
     /**
      * @inheritDoc
      */
-    public function initialize(): void
-    {
-        $this->loadComponent('RequestHandler');
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function beforeFilter(EventInterface $event): void
     {
     }

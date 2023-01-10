@@ -41,6 +41,7 @@ class AppView extends View
         parent::initialize();
 
         if (Configure::check('FrontendPlugin')) {
+            $this->setPlugin(Configure::read('FrontendPlugin'));
             $this->setTheme(Configure::read('FrontendPlugin'));
         }
     }

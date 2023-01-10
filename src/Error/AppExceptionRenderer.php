@@ -28,7 +28,11 @@ class AppExceptionRenderer extends WebExceptionRenderer
      */
     protected function _getController(): Controller
     {
-        if ($this->error->getCode() < 400 || $this->error->getCode() >= 500) {
+        if (Configure::read('debug')) {
+            return parent::_getController();
+        }
+
+        if ($this->error->getCode() >= 500) {
             return parent::_getController();
         }
 
