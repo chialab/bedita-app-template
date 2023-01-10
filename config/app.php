@@ -179,7 +179,7 @@ return [
 
         '_twig_views_' => [
             'className' => FileEngine::class,
-            'path' => CACHE . 'twigView/',
+            'path' => CACHE . 'twig_view/',
             'serialize' => true,
             'duration' => '+1 year',
         ],
