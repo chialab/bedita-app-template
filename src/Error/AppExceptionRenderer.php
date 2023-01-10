@@ -32,10 +32,6 @@ class AppExceptionRenderer extends WebExceptionRenderer
             return parent::_getController();
         }
 
-        if ($this->error->getCode() >= 500) {
-            return parent::_getController();
-        }
-
         $plugin = Configure::read('FrontendPlugin');
         if ($plugin === null) {
             return parent::_getController();
