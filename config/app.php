@@ -537,4 +537,8 @@ return [
 
         'default' => 'it',
     ],
+
+    'Publish' => [
+        'checkDate' => true,
+    ],
 ];
