@@ -1,6 +1,5 @@
 <?php
 
-use App\Error\AppExceptionRenderer;
 use Cake\Cache\Engine\FileEngine;
 use Cake\Database\Connection;
 use Cake\Database\Driver\Mysql;
@@ -216,7 +215,6 @@ return [
      */
     'Error' => [
         'errorLevel' => E_ALL,
-        'exceptionRenderer' => AppExceptionRenderer::class,
         'skipLog' => [],
         'log' => true,
         'trace' => true,
